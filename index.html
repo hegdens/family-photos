@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Miller Family Photos</title>
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Custom Styles -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc; /* slate-50 */
+            color: #334155; /* slate-700 */
+        }
+        /* Style for the image in the modal */
+        #image-modal-content {
+            max-height: 85vh;
+            max-width: 90vw;
+        }
+        /* Adding a subtle transition for the gallery images */
+        .gallery-img {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .gallery-img:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center p-4 sm:p-6 lg:p-8">
+
+    <!-- Main Content -->
+    <main class="w-full max-w-6xl text-center">
+        <!-- Header -->
+        <header class="mb-12">
+            <h1 class="text-4xl md:text-5xl font-bold text-slate-800">The Miller Family</h1>
+            <p class="mt-2 text-lg text-slate-500">Our Cherished Moments</p>
+        </header>
+
+        <!-- Photo Grid -->
+        <div id="photo-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6">
+            <!-- Photos will be dynamically inserted here by JavaScript -->
+        </div>
+        
+        <!-- How-to footer -->
+        <footer class="mt-12 text-sm text-slate-400">
+            <p><strong>How to add photos:</strong> Edit the `photoData` array in this HTML file.</p>
+            <p class="mt-4">&copy; <span id="current-year"></span> The Miller Family</p>
+        </footer>
+    </main>
+    
+    <!-- Photo Thumbnail Template -->
+    <template id="photo-thumbnail-template">
+        <div class="cursor-pointer aspect-square bg-slate-200 rounded-lg overflow-hidden">
+            <img class="w-full h-full object-cover gallery-img" src="" alt="">
+        </div>
+    </template>
+    
+    <!-- Image Modal -->
+    <div id="image-modal" class="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center p-4 hidden z-50">
+        <div class="relative bg-white p-4 rounded-lg shadow-2xl max-w-4xl w-auto">
+            <button id="close-modal" class="absolute -top-3 -right-3 bg-white text-slate-600 rounded-full h-8 w-8 flex items-center justify-center text-2xl font-bold hover:bg-slate-200 hover:text-slate-800 transition-colors">&times;</button>
+            <img id="image-modal-content" src="" alt="Full size view" class="rounded-md">
+            <div class="mt-3 text-center">
+                <h3 id="modal-title" class="font-bold text-lg text-slate-800"></h3>
+                <p id="modal-date" class="text-slate-500 text-sm"></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        // --- PHOTO DATA ---
+        // This is the updated photo data section.
+        // Make sure your image filenames inside the 'assets' folder match the URLs below.
+        // For example, you should have a file named 'beach_day.jpg' inside your 'assets' folder.
+        const photoData = [
+            { url: 'assets/beach_day.jpg', title: 'Beach Vacation', date: 'August 2025' },
+            { url: 'assets/presents.jpg', title: 'Christmas Morning', date: 'December 2024' },
+            { url: 'assets/park_fun.jpg', title: 'Park Adventures', date: 'July 2025' },
+            { url: 'assets/first_day.jpg', title: 'First Day of School', date: 'September 2025' },
+            { url: 'assets/cake_time.jpg', title: 'Birthday Party', date: 'June 2025' },
+            { url: 'assets/on_the_trail.jpg', title: 'Hiking Trip', date: 'October 2024' },
+            { url: 'assets/graduation.jpg', title: 'Graduation Day', date: 'May 2025' },
+            { url: 'assets/reunion.jpg', title: 'Family Reunion', date: 'July 2024' },
+            { url: 'assets/snow_day.jpg', title: 'Winter Snow Day', date: 'January 2025' },
+            { url: 'assets/pumpkins.jpg', title: 'Pumpkin Patch', date: 'October 2024' },
+        ];
+
+        // This code builds the gallery from the photoData array above.
+        function createGallery() {
+            const grid = document.getElementById('photo-grid');
+            const template = document.getElementById('photo-thumbnail-template');
+
+            photoData.forEach(photo => {
+                const thumbnail = document.importNode(template.content, true);
+                const img = thumbnail.querySelector('img');
+                img.src = photo.url;
+                img.alt = photo.title;
+                
+                thumbnail.querySelector('div').addEventListener('click', () => openModal(photo));
+                grid.appendChild(thumbnail);
+            });
+        }
+        
+        // This code handles opening and closing the full-screen image view.
+        const modal = document.getElementById('image-modal');
+        const modalImg = document.getElementById('image-modal-content');
+        const modalTitle = document.getElementById('modal-title');
+        const modalDate = document.getElementById('modal-date');
+        const closeModalBtn = document.getElementById('close-modal');
+
+        function openModal(photo) {
+            modalImg.src = photo.url;
+            modalImg.alt = photo.title;
+            modalTitle.textContent = photo.title;
+            modalDate.textContent = photo.date;
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden'; // Prevent background scrolling
+        }
+
+        function closeModal() {
+            modal.classList.add('hidden');
+            document.body.style.overflow = ''; // Restore scrolling
+        }
+
+        closeModalBtn.addEventListener('click', closeModal);
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) closeModal(); // Close if clicking on the background
+        });
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && !modal.classList.contains('hidden')) closeModal();
+        });
+
+        // Set the current year in the footer.
+        document.getElementById('current-year').textContent = new Date().getFullYear();
+
+        // Run the createGallery function when the page loads.
+        document.addEventListener('DOMContentLoaded', createGallery);
+    </script>
+
+</body>
+</html>
