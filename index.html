@@ -82,7 +82,7 @@
         const photoData = [
             { url: 'assets/kids_b&w.png', title: 'C. A. & H. - Black and White', date: 'Date: Undetermined' },
             { url: 'assets/kids_col3.png', title: 'C. A. & H. - Color', date: 'Date: Undetermined' },
-            { url: 'assets/ch_papa.png', title: 'G. C. Père', date: 'Undetermined' },
+            { url: 'assets/ch_papa.png', title: 'G. C. Père', date: 'Undetermined', position: 'top' },
             { url: 'assets/ma_com_v3.png', title: 'M-A. Communion', date: 'Undetermined' },
             { url: 'assets/marite&momj.png', title: 'Mères', date: 'Undetermined' },
             { url: 'assets/on_the_trail.jpg', title: 'Hiking Trip', date: 'Undetermined' },
@@ -102,6 +102,9 @@
                 const img = thumbnail.querySelector('img');
                 img.src = photo.url;
                 img.alt = photo.title;
+                if (photo.position === 'top') {
+                    img.classList.add('object-top');
+                }
                 
                 thumbnail.querySelector('div').addEventListener('click', () => openModal(photo));
                 grid.appendChild(thumbnail);
