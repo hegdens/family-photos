@@ -60,6 +60,17 @@
             <img class="w-full h-full object-cover gallery-img" src="" alt="">
         </div>
     </template>
+
+    <template id="video-thumbnail-template">
+        <div class="cursor-pointer aspect-square bg-slate-200 rounded-lg overflow-hidden relative group">
+            <img class="w-full h-full object-cover gallery-img" src="" alt="">
+            <div class="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center transition-opacity opacity-0 group-hover:opacity-100">
+                <svg class="w-12 h-12 text-white" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"></path>
+                </svg>
+            </div>
+        </div>
+    </template>
     
     <!-- Image Modal -->
     <div id="image-modal" class="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center p-4 hidden z-50">
@@ -73,6 +84,17 @@
         </div>
     </div>
 
+    <div id="video-modal" class="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center p-4 hidden z-50">
+        <div class="relative bg-white p-4 rounded-lg shadow-2xl max-w-4xl w-auto">
+            <button id="close-video-modal" class="absolute -top-3 -right-3 bg-white text-slate-600 rounded-full h-8 w-8 flex items-center justify-center text-2xl font-bold hover:bg-slate-200 hover:text-slate-800 transition-colors">&times;</button>
+            <div id="video-modal-content"></div> 
+            <div class="mt-3 text-center">
+                <h3 id="video-modal-title" class="font-bold text-lg text-slate-800"></h3>
+                <p id="video-modal-date" class="text-slate-500 text-sm"></p>
+            </div>
+        </div>
+    </div>
+
     <!-- JavaScript -->
     <script>
         // --- PHOTO DATA ---
@@ -80,12 +102,13 @@
         // Make sure your image filenames inside the 'assets' folder match the URLs below.
         // For example, you should have a file named 'beach_day.jpg' inside your 'assets' folder.
         const photoData = [
+           
             { url: 'assets/kids_b&w.png', title: 'C. A. & H. - Black and White', date: 'Date: Undetermined' },
             { url: 'assets/kids_col3.png', title: 'C. A. & H. - Color', date: 'Date: Undetermined' },
             { url: 'assets/ch_papa.png', title: 'G. C. Père', date: 'Undetermined', position: 'top' },
             { url: 'assets/ma_com_v3.png', title: 'M-A. Communion', date: 'Undetermined', position: 'top' },
             { url: 'assets/marite&momj.png', title: 'Mère et fille', date: 'Undetermined' },
-            { url: 'assets/marite_mom.mp4', title: 'Mère et fille - Animé', date: 'Undetermined' },
+            {type: 'video', url: 'assets/marite_mom.mp4', thumbnailUrl: 'assets//marite&momj.png', title: 'Mère et fille - Animé', date: 'Undetermined'},
             { url: 'assets/graduation.jpg', title: 'Coming Soon', date: 'Undetermined' },
             { url: 'assets/reunion.jpg', title: 'Coming Soon', date: 'Undetermined' },
             { url: 'assets/snow_day.jpg', title: 'Coming Soon', date: 'Undetermined' },
@@ -95,58 +118,93 @@
         // This code builds the gallery from the photoData array above.
         function createGallery() {
             const grid = document.getElementById('photo-grid');
-            const template = document.getElementById('photo-thumbnail-template');
+            const photoTemplate = document.getElementById('photo-thumbnail-template');
+            const videoTemplate = document.getElementById('video-thumbnail-template');
 
-            photoData.forEach(photo => {
-                const thumbnail = document.importNode(template.content, true);
-                const img = thumbnail.querySelector('img');
-                img.src = photo.url;
-                img.alt = photo.title;
-                if (photo.position === 'top') {
-                    img.classList.add('object-top');
+            galleryData.forEach(item => {
+                let thumbnail;
+                if (item.type === 'video') {
+                    thumbnail = document.importNode(videoTemplate.content, true);
+                    const img = thumbnail.querySelector('img');
+                    img.src = item.thumbnailUrl; // Use thumbnail for videos
+                    img.alt = item.title;
+                    thumbnail.querySelector('div').addEventListener('click', () => openVideoModal(item));
+                } else { // Default to image
+                    thumbnail = document.importNode(photoTemplate.content, true);
+                    const img = thumbnail.querySelector('img');
+                    img.src = item.url;
+                    img.alt = item.title;
+                    if (item.position === 'top') {
+                        img.classList.add('object-top');
+                    }
+                    thumbnail.querySelector('div').addEventListener('click', () => openImageModal(item));
                 }
-                
-                thumbnail.querySelector('div').addEventListener('click', () => openModal(photo));
                 grid.appendChild(thumbnail);
             });
         }
         
-        // This code handles opening and closing the full-screen image view.
-        const modal = document.getElementById('image-modal');
+        // --- Image Modal Logic (Renamed openModal to openImageModal) ---
+        const imageModal = document.getElementById('image-modal');
         const modalImg = document.getElementById('image-modal-content');
         const modalTitle = document.getElementById('modal-title');
         const modalDate = document.getElementById('modal-date');
-        const closeModalBtn = document.getElementById('close-modal');
-
-        function openModal(photo) {
-            modalImg.src = photo.url;
-            modalImg.alt = photo.title;
-            modalTitle.textContent = photo.title;
-            modalDate.textContent = photo.date;
-            modal.classList.remove('hidden');
-            document.body.style.overflow = 'hidden'; // Prevent background scrolling
+        
+        function openImageModal(item) {
+            modalImg.src = item.url;
+            modalImg.alt = item.title;
+            modalTitle.textContent = item.title;
+            modalDate.textContent = item.date;
+            imageModal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
         }
 
-        function closeModal() {
-            modal.classList.add('hidden');
-            document.body.style.overflow = ''; // Restore scrolling
+        function closeImageModal() {
+            imageModal.classList.add('hidden');
+            document.body.style.overflow = '';
         }
 
-        closeModalBtn.addEventListener('click', closeModal);
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) closeModal(); // Close if clicking on the background
+        // --- ✅ ADDED: Video Modal Logic ---
+        const videoModal = document.getElementById('video-modal');
+        const videoContainer = document.getElementById('video-modal-content');
+        const videoTitle = document.getElementById('video-modal-title');
+        const videoDate = document.getElementById('video-modal-date');
+
+        function openVideoModal(item) {
+            videoContainer.innerHTML = `<video controls autoplay class="rounded-md w-full" src="${item.url}"></video>`;
+            videoTitle.textContent = item.title;
+            videoDate.textContent = item.date;
+            videoModal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeVideoModal() {
+            const video = videoContainer.querySelector('video');
+            if (video) video.pause(); // Stop video playback
+            videoContainer.innerHTML = ''; // Remove video element
+            videoModal.classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+
+        // --- ✅ UPDATED: Event Listeners for both modals ---
+        document.getElementById('close-modal').addEventListener('click', closeImageModal);
+        document.getElementById('close-video-modal').addEventListener('click', closeVideoModal);
+
+        imageModal.addEventListener('click', (e) => {
+            if (e.target === imageModal) closeImageModal();
         });
+        videoModal.addEventListener('click', (e) => {
+            if (e.target === videoModal) closeVideoModal();
+        });
+
         document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && !modal.classList.contains('hidden')) closeModal();
+            if (e.key === 'Escape') {
+                if (!imageModal.classList.contains('hidden')) closeImageModal();
+                if (!videoModal.classList.contains('hidden')) closeVideoModal();
+            }
         });
 
-        // Set the current year in the footer.
         document.getElementById('current-year').textContent = new Date().getFullYear();
-
-        // Run the createGallery function when the page loads.
         document.addEventListener('DOMContentLoaded', createGallery);
     </script>
-
 </body>
 </html>
-kids
