@@ -3,58 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Family Photos</title>
-    <!-- Tailwind CSS for styling -->
+    <title>Family Photos & Videos</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts: Inter -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
-    <!-- Custom Styles -->
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f8fafc; /* slate-50 */
-            color: #334155; /* slate-700 */
-        }
-        /* Style for the image in the modal */
-        #image-modal-content {
-            max-height: 85vh;
-            max-width: 90vw;
-        }
-        /* Adding a subtle transition for the gallery images */
-        .gallery-img {
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-        .gallery-img:hover {
-            transform: scale(1.05);
-            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-        }
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; color: #334155; }
+        #image-modal-content, #video-modal-content video { max-height: 85vh; max-width: 90vw; }
+        .gallery-img { transition: transform 0.3s ease, box-shadow 0.3s ease; }
+        .gallery-img:hover { transform: scale(1.05); box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1); }
     </style>
 </head>
 <body class="min-h-screen flex flex-col items-center justify-center p-4 sm:p-6 lg:p-8">
 
-    <!-- Main Content -->
     <main class="w-full max-w-6xl text-center">
-        <!-- Header -->
         <header class="mb-12">
-            <h1 class="text-4xl md:text-5xl font-bold text-slate-800">Family Photos</h1>
+            <h1 class="text-4xl md:text-5xl font-bold text-slate-800">Family Gallery</h1>
             <p class="mt-2 text-lg text-slate-500">A Walk Through Time</p>
         </header>
-
-        <!-- Photo Grid -->
-        <div id="photo-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6">
-            <!-- Photos will be dynamically inserted here by JavaScript -->
-        </div>
-        
-        <!-- How-to footer -->
+        <div id="photo-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6"></div>
         <footer class="mt-12 text-sm text-slate-400">
-            
-            <p class="mt-4">&copy; <span id="current-year"></span>Family Photos</p>
+            <p class="mt-4">&copy; <span id="current-year"></span> Family Gallery</p>
         </footer>
     </main>
-    
-    <!-- Photo Thumbnail Template -->
+
     <template id="photo-thumbnail-template">
         <div class="cursor-pointer aspect-square bg-slate-200 rounded-lg overflow-hidden">
             <img class="w-full h-full object-cover gallery-img" src="" alt="">
@@ -65,14 +36,11 @@
         <div class="cursor-pointer aspect-square bg-slate-200 rounded-lg overflow-hidden relative group">
             <img class="w-full h-full object-cover gallery-img" src="" alt="">
             <div class="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center transition-opacity opacity-0 group-hover:opacity-100">
-                <svg class="w-12 h-12 text-white" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"></path>
-                </svg>
+                <svg class="w-12 h-12 text-white" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"></path></svg>
             </div>
         </div>
     </template>
-    
-    <!-- Image Modal -->
+
     <div id="image-modal" class="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center p-4 hidden z-50">
         <div class="relative bg-white p-4 rounded-lg shadow-2xl max-w-4xl w-auto">
             <button id="close-modal" class="absolute -top-3 -right-3 bg-white text-slate-600 rounded-full h-8 w-8 flex items-center justify-center text-2xl font-bold hover:bg-slate-200 hover:text-slate-800 transition-colors">&times;</button>
@@ -95,15 +63,10 @@
         </div>
     </div>
 
-    <!-- JavaScript -->
     <script>
-        // --- PHOTO DATA ---
-        // This is the updated photo data section.
-        // Make sure your image filenames inside the 'assets' folder match the URLs below.
-        // For example, you should have a file named 'beach_day.jpg' inside your 'assets' folder.
-        const photoData = [
-           
-            { url: 'assets/kids_b&w.png', title: 'C. A. & H. - Black and White', date: 'Date: Undetermined' },
+        // ✅ UPDATED: Photo and Video Data
+        const galleryData = [
+             { url: 'assets/kids_b&w.png', title: 'C. A. & H. - Black and White', date: 'Date: Undetermined' },
             { url: 'assets/kids_col3.png', title: 'C. A. & H. - Color', date: 'Date: Undetermined' },
             { url: 'assets/ch_papa.png', title: 'G. C. Père', date: 'Undetermined', position: 'top' },
             { url: 'assets/ma_com_v3.png', title: 'M-A. Communion', date: 'Undetermined', position: 'top' },
@@ -113,9 +76,10 @@
             { url: 'assets/reunion.jpg', title: 'Coming Soon', date: 'Undetermined' },
             { url: 'assets/snow_day.jpg', title: 'Coming Soon', date: 'Undetermined' },
             { url: 'assets/pumpkins.jpg', title: 'Coming Soon', date: 'Undetermined' },
+            // Add the rest of your images here, specifying type: 'image'
         ];
 
-        // This code builds the gallery from the photoData array above.
+        // ✅ UPDATED: createGallery function to handle both types
         function createGallery() {
             const grid = document.getElementById('photo-grid');
             const photoTemplate = document.getElementById('photo-thumbnail-template');
